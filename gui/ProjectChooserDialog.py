@@ -174,9 +174,20 @@ class ProjectChooserDialog:
             pymol_object  = model.get_value(iter, 2)  # @+
             projectID     = model.get_value(iter, 0)  # @+
             self.MASTERSSession.ActivedProject = projectID
-            pprint(self.MASTERSSession.ActivedProject)
-        
+            
+            project  =  self.MASTERSSession.projects[projectID]
+            
             self.MASTERSSession.AddJobHistoryToTreeview()
+            
+            self.MASTERSSession.spinbutton_minX.set_value(int(project['Cell']['minX']))
+            self.MASTERSSession.spinbutton_minY.set_value(int(project['Cell']['minY']))
+            self.MASTERSSession.spinbutton_minZ.set_value(int(project['Cell']['minZ']))
+            self.MASTERSSession.spinbutton_maxX.set_value(int(project['Cell']['maxX']))
+            self.MASTERSSession.spinbutton_maxY.set_value(int(project['Cell']['maxY']))
+            self.MASTERSSession.spinbutton_maxZ.set_value(int(project['Cell']['maxZ'])) 
+        
+        
+        
         
         
 

@@ -48,7 +48,15 @@ from gui.ProjectChooserDialog    import ProjectChooserDialog
 from gui.MonteCarloDialog        import MonteCarloDialog
 from modules.MatplotGTK          import PlotGTKWindow, ParseOutputLogFile
 from subprocess                  import Popen
-from MASTERSviewer.MASTERSviewer import MASTERS_main
+
+
+#--------------PyMOL--------------#
+import pymol
+from pymol import *
+from pymol.cgo import *
+
+
+#from MASTERSviewer.MASTERSviewer import MASTERS_main
 # Roda o gateway
 p = Popen(['sh', '/home/labio/Documents/NetlogoMasters/MASTERS/run_masters_gateway.sh'])
 
@@ -125,6 +133,46 @@ class MastersMain():
         self.MonteCarloDialog     = MonteCarloDialog(self)
         #----------------------------------------------------------------------------#
 
+
+        
+        
+        adjustment1 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
+        self.spinbutton_minX  = self.builder.get_object("spinbutton_minX")
+        self.spinbutton_minX.set_adjustment(adjustment1)
+        self.spinbutton_minX.update()
+        #self.spinbutton_minX.set_value(int(project['Cell']['minX']))
+
+        adjustment2 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
+        self.spinbutton_minY  = self.builder.get_object("spinbutton_minY")
+        self.spinbutton_minY.set_adjustment(adjustment2)
+        self.spinbutton_minY.update()
+        #self.spinbutton_minY.set_value(int(project['Cell']['minY']))
+
+        adjustment3 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
+        self.spinbutton_minZ  = self.builder.get_object("spinbutton_minZ")
+        self.spinbutton_minZ.set_adjustment(adjustment3)
+        self.spinbutton_minZ.update()
+        #self.spinbutton_minZ.set_value(int(project['Cell']['minZ']))
+        
+        adjustment4 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
+        self.spinbutton_maxX  = self.builder.get_object("spinbutton_maxX")
+        self.spinbutton_maxX.set_adjustment(adjustment4)
+        self.spinbutton_maxX.update()
+        #self.spinbutton_maxX.set_value(int(project['Cell']['maxX']))
+
+        adjustment5 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
+        self.spinbutton_maxY  = self.builder.get_object("spinbutton_maxY")
+        self.spinbutton_maxY.set_adjustment(adjustment5)
+        self.spinbutton_maxY.update()
+        #self.spinbutton_maxY.set_value(int(project['Cell']['maxY']))
+
+        adjustment6 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
+        self.spinbutton_maxZ  = self.builder.get_object("spinbutton_maxZ")
+        self.spinbutton_maxZ.set_adjustment(adjustment6)
+        self.spinbutton_maxZ.update()
+        #self.spinbutton_maxZ.set_value(int(project['Cell']['maxZ'])) 
+
+        
         
         # testing the workspace dialog True/False 
         if self.GUIConfig['HideWorkSpaceDialog'] == False:
@@ -403,9 +451,210 @@ class MastersMain():
         gtk.main()
 
 
+    def on_menuitem_show_model_activate (self, menuitem):
+        """ Function doc """
+        tree          = self.builder.get_object('treeview3')
+        selection     = tree.get_selection()
+        model         = tree.get_model()
+        (model, iter) = selection.get_selected()
 
+        if iter != None:
+            #print model, iter
+            JobID         = model.get_value(iter, 0)
+            self.LoadPyMOLOutput(self.projects[self.ActivedProject]['Jobs'][JobID]['Output'])
+        
+    def LoadPyMOLOutput (self, filein):
+        """ Function doc """
+        cmd.load(filein)
+        cmd.show("spheres")                               
+        cmd.hide('lines')
+        cmd.show('ribbon')                                
+        cmd.color('blue')
+        
+        cmd.do('select resn leu')
+        cmd.do('color red, sele')
+        cmd.do('select resn ala')
+        cmd.do('color red, sele')
+        cmd.do('select resn ile')
+        cmd.do('color red, sele')
+        cmd.do('select resn pro')
+        cmd.do('color red, sele')
+        cmd.do('select resn val')
+        cmd.do('color red, sele')
+        cmd.do('select resn met')
+        cmd.do('color red, sele')
+        cmd.do('select resn gly')
+        cmd.do('color red, sele')
+        cmd.do('select resn cys')
+        cmd.do('color red, sele') 
+   
+   
+    
+    
+    def on_toolbutton_ShowBox_clicked(self, button):
+        """ Function doc """
+        if self.builder.get_object("toolbutton_ShowBox").get_active():
+            self.DrawCell()
+
+    
+    def on_spinbutton_change_value2(self, widget, event= None):
+        
+        if widget == self.builder.get_object("spinbutton_minX"):
+            minX  = self.builder.get_object("spinbutton_minX").get_value_as_int()
+            self.projects[self.ActivedProject]['Cell']['minX'] = minX
+        
+        if widget == self.builder.get_object("spinbutton_minY"):
+            minY  = self.builder.get_object("spinbutton_minY").get_value_as_int()
+            self.projects[self.ActivedProject]['Cell']['minY'] = minY
+        
+        if widget == self.builder.get_object("spinbutton_minZ"):
+            minZ  = self.builder.get_object("spinbutton_minZ").get_value_as_int()
+            self.projects[self.ActivedProject]['Cell']['minZ'] = minZ 
+
+        if widget == self.builder.get_object("spinbutton_maxX"):
+            maxX  = self.builder.get_object("spinbutton_maxX").get_value_as_int()
+            self.projects[self.ActivedProject]['Cell']['maxX'] = maxX 
+        
+        if widget == self.builder.get_object("spinbutton_maxY"):
+            maxY  = self.builder.get_object("spinbutton_maxY").get_value_as_int()
+            self.projects[self.ActivedProject]['Cell']['maxY'] = maxY 
+
+        if widget == self.builder.get_object("spinbutton_maxZ"):
+            maxZ  = self.builder.get_object("spinbutton_maxZ").get_value_as_int()
+            self.projects[self.ActivedProject]['Cell']['maxZ'] = maxZ 
+        
+        #if self.builder.get_object("toolbutton_ShowBox").get_active():
+        self.DrawCell()
+        
+        
+        
+        
+    
+    def ChangeCell (self, PyMOL = False):
+        """ Function doc """
+        minX  = self.builder.get_object("spinbutton_minX").get_value_as_int()
+        minY  = self.builder.get_object("spinbutton_minY").get_value_as_int()
+        minZ  = self.builder.get_object("spinbutton_minZ").get_value_as_int()
+        maxX  = self.builder.get_object("spinbutton_maxX").get_value_as_int()
+        maxY  = self.builder.get_object("spinbutton_maxY").get_value_as_int()
+        maxZ  = self.builder.get_object("spinbutton_maxZ").get_value_as_int()
+        
+        self.projects[self.ActivedProject]['Cell']['minX'] = minX 
+        self.projects[self.ActivedProject]['Cell']['minY'] = minY 
+        self.projects[self.ActivedProject]['Cell']['minZ'] = minZ 
+        self.projects[self.ActivedProject]['Cell']['maxX'] = maxX 
+        self.projects[self.ActivedProject]['Cell']['maxY'] = maxY 
+        self.projects[self.ActivedProject]['Cell']['maxZ'] = maxZ 
+        self.DrawCell()
+    
+    
+    def DrawCell (self):
+        """ Function doc """
+        minX = self.projects[self.ActivedProject]['Cell']['minX']
+        minY = self.projects[self.ActivedProject]['Cell']['minY']
+        minZ = self.projects[self.ActivedProject]['Cell']['minZ']
+        maxX = self.projects[self.ActivedProject]['Cell']['maxX']
+        maxY = self.projects[self.ActivedProject]['Cell']['maxY']
+        maxZ = self.projects[self.ActivedProject]['Cell']['maxZ']
+        
+        selection="(all)"
+        padding=0.0
+        linewidth=2.0
+        r=1.0
+        g=1.0
+        b=1.0
+        
+        boundingBox = [
+                LINEWIDTH, float(linewidth),
+
+                BEGIN, LINES,
+                COLOR, float(r), float(g), float(b),
+
+                VERTEX, minX, minY, minZ,       #1
+                VERTEX, minX, minY, maxZ,       #2
+
+                VERTEX, minX, maxY, minZ,       #3
+                VERTEX, minX, maxY, maxZ,       #4
+
+                VERTEX, maxX, minY, minZ,       #5
+                VERTEX, maxX, minY, maxZ,       #6
+
+                VERTEX, maxX, maxY, minZ,       #7
+                VERTEX, maxX, maxY, maxZ,       #8
+
+
+                VERTEX, minX, minY, minZ,       #1
+                VERTEX, maxX, minY, minZ,       #5
+
+                VERTEX, minX, maxY, minZ,       #3
+                VERTEX, maxX, maxY, minZ,       #7
+
+                VERTEX, minX, maxY, maxZ,       #4
+                VERTEX, maxX, maxY, maxZ,       #8
+
+                VERTEX, minX, minY, maxZ,       #2
+                VERTEX, maxX, minY, maxZ,       #6
+
+
+                VERTEX, minX, minY, minZ,       #1
+                VERTEX, minX, maxY, minZ,       #3
+
+                VERTEX, maxX, minY, minZ,       #5
+                VERTEX, maxX, maxY, minZ,       #7
+
+                VERTEX, minX, minY, maxZ,       #2
+                VERTEX, minX, maxY, maxZ,       #4
+
+                VERTEX, maxX, minY, maxZ,       #6
+                VERTEX, maxX, maxY, maxZ,       #8
+
+                END
+        ]
+
+        try:
+            cmd.delete("box_1")
+        except:
+            pass
+        
+        boxName = "box_1"
+        cmd.set('auto_zoom', 0)
+        cmd.load_cgo(boundingBox,boxName)
+        #cmd.set_frame(-1)
+        
+            
+    def run(self):
+        gtk.main()
+
+
+
+def PyMOL_GUIConfig():
+    """ Function doc """
+    #-------------------- config PyMOL ---------------------#
+    pymol.cmd.set("internal_gui", 1)                        #
+    pymol.cmd.set("internal_gui_mode", 1)                   #
+    pymol.cmd.set("internal_feedback", 1)                   #
+    pymol.cmd.set("internal_gui_width", 220)                #
+    pymol.cmd.set("cartoon_fancy_helices", 'on')            #  
+    pymol.cmd.set('ribbon_sampling', 3)
+    sphere_scale = 0.1                                      #
+    stick_radius = 0.15                                     #
+    label_distance_digits = 4                               #
+    mesh_width = 0.3                                        #
+    cmd.set('sphere_scale', sphere_scale)                   #
+    cmd.set('stick_radius', stick_radius)                   #
+    cmd.set('label_distance_digits', label_distance_digits) #
+    cmd.set('mesh_width', mesh_width)                       #
+    cmd.set("retain_order")         # keep atom ordering    #
+    #cmd.bg_color("grey")            # background color     #
+    cmd.do("set field_of_view, 70")                         #
+    cmd.do("set ray_shadows,off")                           #
+    #-------------------------------------------------------#
 
 def main():
+    pymol.finish_launching()    
+    gtk.gdk.threads_init()
+    PyMOL_GUIConfig()
+    
     masters = MastersMain()
     masters.run()
     #fecha o gateway quando for sair do programa
