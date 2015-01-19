@@ -86,6 +86,7 @@ class MastersMain():
         self.builder = gtk.Builder()                                                  #
         self.builder.add_from_file(os.path.join(self.gui, "MastersMainWindow.glade")) #
         self.builder.add_from_file(os.path.join(self.gui, "MessageDialogs.glade")) #
+        self.builder.add_from_file(os.path.join(self.gui, "MastersAboutDialog.glade")) 
         self.win     = self.builder.get_object("window1")                             #
         self.win.show()                                                               #
         self.builder.connect_signals(self)                                            #
@@ -131,6 +132,7 @@ class MastersMain():
         self.MessageDialogQuestion= self.builder.get_object('messagedialog_question')#
         self.MessageDialogError   = self.builder.get_object('messagedialog_error')   #
         self.MonteCarloDialog     = MonteCarloDialog(self)
+        self.AboutDialog          = self.builder.get_object('aboutdialog')
         #----------------------------------------------------------------------------#
 
 
@@ -188,8 +190,9 @@ class MastersMain():
             self.LoadNewProjectDialog()
 
 
-    
-    
+        #------------PYMOL----------------#
+        self.nonpolarColor = 'green'
+        self.polarColor    = 'purple' 
     
     ''' 
         --------------------------------------------------
@@ -323,6 +326,15 @@ class MastersMain():
         self.builder.get_object('statusbar1').push(0, text)
 
 
+    #------------------------------------------------#
+    #                   MAIN MENU                    #
+    #------------------------------------------------#
+    
+    def on_imagemenuitem_about_activate(self, menuitem):
+        """ Function doc """
+        self.AboutDialog.run()
+        self.AboutDialog.hide()
+    
     #------------------------------------------------#
     #               TOOLBAR  METHODS                 #
     #------------------------------------------------#
@@ -461,41 +473,45 @@ class MastersMain():
         if iter != None:
             #print model, iter
             JobID         = model.get_value(iter, 0)
-            self.LoadPyMOLOutput(self.projects[self.ActivedProject]['Jobs'][JobID]['Output'])
+            self.LoadFileInPyMOL(self.projects[self.ActivedProject]['Jobs'][JobID]['Output'])
         
-    def LoadPyMOLOutput (self, filein):
+    def LoadFileInPyMOL (self, filein):
         """ Function doc """
         cmd.load(filein)
         cmd.show("spheres")                               
         cmd.hide('lines')
         cmd.show('ribbon')                                
-        cmd.color('blue')
+        cmd.color(self.polarColor)
         
         cmd.do('select resn leu')
-        cmd.do('color red, sele')
+        cmd.do('color ' + self.nonpolarColor + ', sele')
         cmd.do('select resn ala')
-        cmd.do('color red, sele')
+        cmd.do('color ' + self.nonpolarColor + ', sele')
         cmd.do('select resn ile')
-        cmd.do('color red, sele')
+        cmd.do('color ' + self.nonpolarColor + ', sele')
         cmd.do('select resn pro')
-        cmd.do('color red, sele')
+        cmd.do('color ' + self.nonpolarColor + ', sele')
         cmd.do('select resn val')
-        cmd.do('color red, sele')
+        cmd.do('color ' + self.nonpolarColor + ', sele')
         cmd.do('select resn met')
-        cmd.do('color red, sele')
+        cmd.do('color ' + self.nonpolarColor + ', sele')
         cmd.do('select resn gly')
-        cmd.do('color red, sele')
+        cmd.do('color ' + self.nonpolarColor + ', sele')
         cmd.do('select resn cys')
-        cmd.do('color red, sele') 
+        cmd.do('color ' + self.nonpolarColor + ', sele') 
    
    
     
     
     def on_toolbutton_ShowBox_clicked(self, button):
         """ Function doc """
-        if self.builder.get_object("toolbutton_ShowBox").get_active():
+        if button.get_active():
             self.DrawCell()
-
+        else:
+            try:
+                cmd.delete("box")
+            except:
+                pass
     
     def on_spinbutton_change_value2(self, widget, event= None):
         
@@ -523,8 +539,8 @@ class MastersMain():
             maxZ  = self.builder.get_object("spinbutton_maxZ").get_value_as_int()
             self.projects[self.ActivedProject]['Cell']['maxZ'] = maxZ 
         
-        #if self.builder.get_object("toolbutton_ShowBox").get_active():
-        self.DrawCell()
+        if self.builder.get_object("toolbutton_ShowBox").get_active():
+            self.DrawCell()
         
         
         
@@ -560,9 +576,9 @@ class MastersMain():
         selection="(all)"
         padding=0.0
         linewidth=2.0
-        r=1.0
-        g=1.0
-        b=1.0
+        r=0.0
+        g=0.0
+        b=0.0
         
         boundingBox = [
                 LINEWIDTH, float(linewidth),
@@ -612,11 +628,11 @@ class MastersMain():
         ]
 
         try:
-            cmd.delete("box_1")
+            cmd.delete("box")
         except:
             pass
         
-        boxName = "box_1"
+        boxName = "box"
         cmd.set('auto_zoom', 0)
         cmd.load_cgo(boundingBox,boxName)
         #cmd.set_frame(-1)
@@ -631,7 +647,7 @@ def PyMOL_GUIConfig():
     """ Function doc """
     #-------------------- config PyMOL ---------------------#
     pymol.cmd.set("internal_gui", 1)                        #
-    pymol.cmd.set("internal_gui_mode", 1)                   #
+    pymol.cmd.set("internal_gui_mode", 0)                   #
     pymol.cmd.set("internal_feedback", 1)                   #
     pymol.cmd.set("internal_gui_width", 220)                #
     pymol.cmd.set("cartoon_fancy_helices", 'on')            #  
@@ -645,8 +661,8 @@ def PyMOL_GUIConfig():
     cmd.set('label_distance_digits', label_distance_digits) #
     cmd.set('mesh_width', mesh_width)                       #
     cmd.set("retain_order")         # keep atom ordering    #
-    #cmd.bg_color("grey")            # background color     #
-    cmd.do("set field_of_view, 70")                         #
+    cmd.bg_color("white")            # background color     #
+    #cmd.do("set field_of_view, 70")                         #
     cmd.do("set ray_shadows,off")                           #
     #-------------------------------------------------------#
 
