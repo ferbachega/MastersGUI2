@@ -83,13 +83,13 @@ class MonteCarloDialog:
         #---------------------------------------------#
 
         if ReRunJOB == None:
-            self.InputFiles = {
-                              'input_coords': '/home/labio/MastersWorkSpace/labio_project_Jan_20_2015/12_initialCoordinates.pdb',
-                              }
-        else:
-            self.InputFiles = {
-                              'input_coords': '/home/labio/MastersWorkSpace/labio_project_Jan_20_2015/12_initialCoordinates.pdb',
-                              }
+            self.InputFiles = None#{
+                             #'input_coords': self.Session.projects[self.Session.ActivedProject]['Jobs']['0']['Output']
+                             #}
+        else:                #
+            self.InputFiles = None #{
+                             #'input_coords': self.Session.projects[self.Session.ActivedProject]['Jobs']['0']['Output']
+                             #}
                               
     #--------------Dialog methods----------------#
     def ImportCellValorsFromProject (self):
@@ -207,19 +207,39 @@ class MonteCarloDialog:
         step = 0
         
         
-        
+        start      = time.asctime(time.localtime(time.time()))
         self.Session.projects[self.Session.ActivedProject]['Jobs'][Job] = {
-                                     'Title'      : self.InputParamaters['title'],
-                                     'Folder'     : self.folder                  ,                
-                                     'Input'      : InputFileName                ,
-                                     'Type'       : 'MonteCarlo'                 , 
-                                     'Status'     : 'running'                    ,
-                                     'Energy'     : '  -  '                      ,                   
-                                     'Start'      : '  -  '                      ,                 
-                                     'End'        : 'running'                    ,
-                                     'Energy'     : '  -  '                      ,
-                                     'parameters' : self.InputParamaters['MCparameters']
+                                     'Title'             : self.InputParamaters['title']         ,
+                                     'Folder'            : self.folder                           ,                
+                                     'Input'             : InputFileName                         ,
+                                     'Output'            : os.path.join(self.folder,title+'.pdb'),
+                                     'LogFile'           : os.path.join(self.folder,title+'.log'),
+                                     'Type'              : 'MonteCarlo'                          , 
+                                     'Status'            : 'running'                             ,
+                                     'Energy'            : '  -  '                               ,                   
+                                     'LowestEnergyModel' : '  -  '                               ,
+                                     'Start'             : start                                 ,                 
+                                     'End'               : 'running'                             ,
+                                     'Energy'            : '  -  '                               ,
+                                     'parameters'        : self.InputParamaters['MCparameters']
                                      }              
+        
+        
+        
+    #projects[index]['Jobs']['0'] = {
+    #                            'Title'  : 'Extended coordinates from AB sequence',
+    #                            'Folder' : folder, #
+    #                            #'File'   : os.path.join(Filename),
+    #                            'Input'  : '-',
+    #                            'Output' : os.path.join(Filename),
+    #                            'LogFile': os.path.join(Filename),
+    #                            'Type'   : 'Initial Coordinates', #
+    #                            'Energy' : '-', # exemplo de como deve ser o dic jobs
+    #                            'Start'  : start, #
+    #                            'End'    : 'finished' } #
+    #    
+        
+
         json.dump(self.Session.projects, open(FOLDER + 'ProjectHistory.dat', 'w'), indent=2)
         self.Session.AddJobHistoryToTreeview()
         
@@ -229,34 +249,46 @@ class MonteCarloDialog:
         pprint(self.Session.projects[self.Session.ActivedProject]['Jobs'][Job])
         
 
-        
+        self.Session.MonteCarloDialog.dialog.hide()
         #self.Session.WindowControl.AddJobHistoryToTreeview(liststore, Jobs)
         
         
-        while masters.is_running():
-            masters.step()
+        try:
+            while masters.is_running():
+                masters.step()
 
-            # Update UI
-            while gtk.events_pending():
-                gtk.main_iteration(False)
+                # Update UI
+                while gtk.events_pending():
+                    gtk.main_iteration(False)
 
-            # ---------- adicionar aqui  tudo que  sera gerado de arquivos --------- #
-            try:
-                _parameters = LogFileParse (os.path.join(self.folder,title+'-current.pdb'))
-                fromParametersToFile(_parameters, self.folder, Job +'_MonteCarlo.log') 
-                
-                os.rename(
-                         os.path.join(self.folder,title+'-current.pdb'),
-                         os.path.join(self.folder,title+'_step_' + str(step))
-                         )
-                step += 1
-                
-            except:
-                pass
-                
-        self.Session.projects[self.Session.ActivedProject]['Jobs'][Job]['End'] = 'finished'
-
-
+                # ---------- adicionar aqui  tudo que  sera gerado de arquivos --------- #
+                try:
+                    
+                    _parameters = LogFileParse (os.path.join(self.folder,title+'-current.pdb'))
+                    fromParametersToFile(_parameters, self.folder, Job +'_MonteCarlo.log') 
+                    
+                    self.Session.projects[self.Session.ActivedProject]['Jobs'][Job]['Energy'] = _parameters['lowerEnergy']
+                    self.Session.projects[self.Session.ActivedProject]['Jobs'][Job]['LowestEnergyModel']= _parameters['LowestEnergyModel']
+                    #print self.Session.projects[self.Session.ActivedProject]['Jobs'][Job]['Energy']
+                    #self.Session.projects[self.Session.ActivedProject]['Jobs'][Job]['Energy'] = _parameters['lowerEnergyModel']
+                    
+                    self.Session.AddJobHistoryToTreeview()
+                    
+                    os.rename(
+                             os.path.join(self.folder,title+'-current.pdb'),
+                             os.path.join(self.folder,title+'_step_' + str(step))
+                             )
+                    step += 1
+                    
+                except:
+                    pass
+        
+            self.Session.projects[self.Session.ActivedProject]['Jobs'][Job]['Status'] = 'finished'
+        except Exception as error:
+            self.Session.projects[self.Session.ActivedProject]['Jobs'][Job]['Status'] = 'aborted'
+            #print 'olha o erro ai moreno' 
+            print error
+            
         json.dump(self.Session.projects, open(FOLDER + 'ProjectHistory.dat', 'w'), indent=2)
         self.Session.AddJobHistoryToTreeview()
     
@@ -287,6 +319,11 @@ class MonteCarloDialog:
         # Searching Agents
         TemperatureFactorSearch          = self.builder.get_object('TemperatureFactorSearch_entry').get_text()
 
+        
+        self.InputFiles = {
+                           'input_coords': self.Session.projects[self.Session.ActivedProject]['Jobs']['0']['Output']
+                           }        
+        
         InputFiles       =  {
                              'input_coords'      : self.InputFiles['input_coords'],
                              'spatial_restraints': None,

@@ -25,8 +25,37 @@ import os
 from pprint import pprint
 
 
-
-
+def ParseOutputLogFile (filein):
+    """ Function doc """
+    arq = open(filein, 'r')
+    model                = []
+    acc_director_agents  = []
+    acc_searching_agents = []
+    energy               = []
+    
+    
+    for line in arq:
+        line2 = line.split()
+        if len(line2) ==4:
+            if line[0] != '#':
+                #print line 
+                model               .append(float(line2[0]))
+                acc_director_agents .append(float(line2[1]))
+                acc_searching_agents.append(float(line2[2]))
+                energy              .append(float(line2[3]))
+                #print model, acc_director_agents, acc_searching_agents, energy
+    
+    parameters = {
+                 'type'                 : 'masterslog'        ,
+                 'model'                : model               , 
+                 'acc_director_agents'  : acc_director_agents , 
+                 'acc_searching_agents' : acc_searching_agents, 
+                 'energy'               : energy              
+                 }
+    return parameters #model, acc_director_agents, acc_searching_agents, energy
+    
+    
+    
 def fromParametersToFile (par, path = None, title = None  ):
     """ Function doc """
     if path == None:
@@ -79,7 +108,7 @@ def LogFileParse (filein):
             if line2[1] == 'LOWER':
                 if line2[2] == 'ENERGY':
                     if line2[3] == 'MODEL:':
-                        parameters['lowerEnergyModel'] = line2[4]
+                        parameters['LowestEnergyModel'] = line2[4]
             
             if line2[1] == 'current_energy:':
                 parameters['current_energy'] = line2[2]
@@ -93,8 +122,9 @@ def LogFileParse (filein):
     return parameters
     
 def main():
-	LogFileParse ('/home/labio/MastersWorkSpace/labio_project_Jan_20_2015/3_MonteCarlo/3_MonteCarlo_step_1')
-	return 0
+    LogFileParse ('/home/labio/MastersWorkspace/TesteComMasters_Jan_27_2015/2_MonteCarlo/2_MonteCarlo_step_137')
+    #ParseOutputLogFile ('/home/labio/Dropbox/mastersGUI/1_MonteCarlo.log')
+    return 0
 
 if __name__ == '__main__':
 	main()

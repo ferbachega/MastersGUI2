@@ -46,6 +46,7 @@ from gui.NewProjectDialog     import NewProjectDialog
 from gui.WorkspaceDialog      import WorkspaceDialog
 from gui.ProjectChooserDialog import ProjectChooserDialog
 from gui.MonteCarloDialog     import MonteCarloDialog
+from modules.MatplotGTK       import PlotGTKWindow, ParseOutputLogFile
 #from WindowControl          import WindowControl
 #from MCwindow               import MonteCarloSimulationWindow
 #from MastersWorkSpaceDialog import WorkSpaceDialog
@@ -215,7 +216,7 @@ class MastersMain():
                     if Jobs[str(i)]==None:
                         pass
                     else:
-                        data = [str(i), Jobs[i]['Type'],Jobs[i]['Start'],Jobs[i]['End'],Jobs[i]['Energy'],Jobs[i]['Title'] ]
+                        data = [str(i), Jobs[i]['Type'],Jobs[i]['Start'],Jobs[i]['Status'],Jobs[i]['Energy'],Jobs[i]['LowestEnergyModel'] ]
                         #print i, data
                         model.append(data)
             except:
@@ -229,17 +230,25 @@ class MastersMain():
 
     def LoadFileToTextView(self, filename):
         ## add Loading message to status bar and ensure GUI is current
-        fin = open(filename, "r")
-        text = fin.read()
-        fin.close()
-        
-        # disable the text view while loading the buffer with the text
-        self.text_view.set_sensitive(False)
-        buff = self.text_view.get_buffer()
-        buff.set_text(text)
-        buff.set_modified(False)
-        self.text_view.set_sensitive(True)
-    
+        try:
+            fin = open(filename, "r")
+            text = fin.read()
+            fin.close()
+            
+            # disable the text view while loading the buffer with the text
+            self.text_view.set_sensitive(False)
+            buff = self.text_view.get_buffer()
+            buff.set_text(text)
+            buff.set_modified(False)
+            self.text_view.set_sensitive(True)
+        except:
+            self.text_view.set_sensitive(False)
+            buff = self.text_view.get_buffer()
+            buff.set_text("Output file not found")
+            buff.set_modified(False)
+            self.text_view.set_sensitive(True)
+            
+            
     def DeleteProject (self, projectID):
         """ Function doc """
         self.projects[projectID] = None
@@ -475,8 +484,24 @@ class MastersMain():
                 #print filename
                 self.LoadFileToTextView(filename)
             
-            
-            
+    
+    #------------------------------------------------#
+    #                 TREEVIEW MENU                  #
+    #------------------------------------------------#
+    
+    def on_menuitem_plot_graph_activate (self, menuitem):
+        """ Function doc """
+        tree          = self.builder.get_object('treeview3')
+        selection     = tree.get_selection()
+        model         = tree.get_model()
+        (model, iter) = selection.get_selected()
+
+        if iter != None:
+            #print model, iter
+            JobID         = model.get_value(iter, 0)
+        
+            parameters = ParseOutputLogFile (self.projects[self.ActivedProject]['Jobs'][JobID]['LogFile'])
+            _PlotGTKWindow = PlotGTKWindow(parameters)
             
     def run(self):
         gtk.main()

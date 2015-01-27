@@ -460,7 +460,6 @@
                                                     <property name="width_request">140</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">True</property>
-                                                    <property name="editable">False</property>
                                                     <property name="invisible_char">●</property>
                                                     <property name="text" translatable="yes">20</property>
                                                     <property name="invisible_char_set">True</property>

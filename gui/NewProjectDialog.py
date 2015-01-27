@@ -91,16 +91,17 @@ def CreateNewProject (projects, parameters):
     Filename = GeneratePDBtoProject(projects[index], parameters = None, filename = _filename)
     
     projects[index]['Jobs']['0'] = {
-                                'Title'  : 'Extended coordinates from AB sequence',
-                                'Folder' : folder, #
-                                #'File'   : os.path.join(Filename),
-                                'Input'  : '-',
-                                'Output' : os.path.join(Filename),
-                                'LogFile': '',
-                                'Type'   : 'Initial Coordinates', #
-                                'Energy' : '-', # exemplo de como deve ser o dic jobs
-                                'Start'  : start, #
-                                'End'    : '  finished  ' } #
+                                'Title'             : 'Extended coordinates from AB sequence',
+                                'Folder'            : folder                                 , 
+                                'Input'             : '-'                                    ,
+                                'Output'            : os.path.join(Filename)                 ,
+                                'LogFile'           : os.path.join(Filename)                 ,
+                                'Type'              : 'Initial Coordinates'                  , 
+                                'Status'            : 'finished'                             ,
+                                'Energy'            : '  -  '                                , 
+                                'LowestEnergyModel' : '  -  '                                ,
+                                'Start'             : start                                  , 
+                                'End'               : 'finished' } #
     
     json.dump(projects, open(FOLDER + 'ProjectHistory.dat', 'w'), indent=2)
 

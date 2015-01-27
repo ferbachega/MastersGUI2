@@ -7,7 +7,7 @@ import gtk
 
 from matplotlib.figure import Figure
 from numpy import arange, sin, pi
-
+from pylab import *
 # uncomment to select /GTK/GTKAgg/GTKCairo
 #from matplotlib.backends.backend_gtk import FigureCanvasGTK as FigureCanvas
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
@@ -20,6 +20,45 @@ from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as Navig
 # implement the default mpl key bindings
 from matplotlib.backend_bases import key_press_handler
 #from matplotlib.widgets import Cursor
+
+
+
+
+
+
+
+
+
+def ParseOutputLogFile (filein):
+    """ Function doc """
+    arq = open(filein, 'r')
+    model                = []
+    acc_director_agents  = []
+    acc_searching_agents = []
+    energy               = []
+    
+    
+    for line in arq:
+        line2 = line.split()
+        if len(line2) ==4:
+            if line[0] != '#':
+                #print line 
+                model               .append(float(line2[0]))
+                acc_director_agents .append(float(line2[1]))
+                acc_searching_agents.append(float(line2[2]))
+                energy              .append(float(line2[3]))
+                #print model, acc_director_agents, acc_searching_agents, energy
+    
+    parameters = {
+                 'type'                 : 'masterslog'        ,
+                 'model'                : model               , 
+                 'acc_director_agents'  : acc_director_agents , 
+                 'acc_searching_agents' : acc_searching_agents, 
+                 'energy'               : energy              
+                 }
+    return parameters #model, acc_director_agents, acc_searching_agents, energy
+
+
 
 class PlotGTKWindow:
     
@@ -34,20 +73,29 @@ class PlotGTKWindow:
         print('on pick line:', zip(xdata[ind], ydata[ind]))
         self.ax.plot(xdata[ind], ydata[ind], 'bo', picker=5)
 
-
-
     def __init__ (self, parameters = None):
         """ Function doc """
         self.win = gtk.Window()
         self.win.connect("destroy", lambda x: gtk.main_quit())
-        self.win.set_default_size(560,420)
-        self.win.set_title("Embedding in GTK")
+        self.win.set_default_size(900,600)
+        self.win.set_title("MASTERS plot graph window")
 
         vbox = gtk.VBox()
         self.win.add(vbox)
 
-        self.fig = Figure(figsize=(1,1), dpi=80)
-        self.ax  = self.fig.add_subplot(111)
+        # fig, (ax0, ax1) = plt.subplots(nrows=2)
+        # 
+        # ax0.plot(x, y)
+        # ax0.set_title('normal spines')
+        # ax1.plot(x, y)
+        # ax1.set_title('bottom-left spines')
+        # 
+        # # Hide the right and top spines
+        # ax1.spines['right'].set_visible(False)
+        # ax1.spines['top'].set_visible(False)
+        # # Only show ticks on the left and bottom spines
+        # ax1.yaxis.set_ticks_position('left')
+        # ax1.xaxis.set_ticks_position('bottom')
         
         if parameters == None:
             x = arange(0.0,3.0,0.01)
@@ -62,37 +110,59 @@ class PlotGTKWindow:
             
             
         else:
-            x = parameters['X']
-            y = parameters['Y']
+            x  = parameters['model'               ]
+            y1 = parameters['acc_director_agents' ]
+            y2 = parameters['acc_searching_agents']
+            y3 = parameters['energy'              ]
+                
 
         
-        self.win.set_title(parameters['title'])
-        #self.ax.plot(t,s)
-        self.ax.plot(x, y, 'ko',x, y,'k', picker=5)
-
-        self.ax.set_xlabel(parameters['xlabel'])
-        self.ax.set_ylabel(parameters['ylabel'])        
-        self.ax.grid(True)
-        #cursor = Cursor(self.ax, useblit=True, color='red', linewidth=2 )
-
+        f = Figure(figsize=(5, 4), dpi=100)
         
-        self.canvas = FigureCanvas(self.fig)  # a gtk.DrawingArea
+       
+        font = {#'family' : 'DejaVu Sans Mono',
+                'color'  : 'black',
+                'weight' : 'normal',
+                'size'   : 12,
+                }     
+            
+        self.ax = f.add_subplot(3, 1, 1)
+        #self.ax.set_title('line styles')
+
+        self.ax.plot(x, y1, 'y.-')
+        #self.ax.set_xlabel('model')
+        self.ax.set_ylabel('Acceptance ratio\ndirector agents (a.u.)', fontdict=font)   
+        self.ax.set_xlabel('models' , fontdict=font)
+
+     
+        self.ax = f.add_subplot(3, 1, 2)
+        self.ax.plot(x, y2, 'r.-', )
+        #self.ax.plot(x, y2, linewidth=1, color='black',label='zorder=10',zorder = 10)
+        self.ax.set_xlabel('models')
+        self.ax.set_ylabel('Acceptance ratio\nsearching agents (a.u.)', fontdict=font)   
+        
+        
+        self.ax = f.add_subplot(3, 1, 3)
+        #self.ax.set_title('line styles')
+
+        self.ax.plot(x, y3, 'g.-')
+        self.ax.set_xlabel('models' , fontdict=font)
+        self.ax.set_ylabel('Energy (a.u.)', fontdict=font)    
+                
+        f.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=0.34)        
+        
+       
+        self.canvas = FigureCanvas(f)  # a gtk.DrawingArea
         vbox.pack_start(self.canvas)
         self.toolbar = NavigationToolbar(self.canvas, self.win)
         vbox.pack_start(self.toolbar, False, False)
-        
-        
-        
-        self.canvas.mpl_connect('key_press_event', self.on_key_event)
-        print 'antes'
-        self.canvas.mpl_connect('pick_event', self.on_pick)
-        print 'depois'
+
         self.win.show_all()
         gtk.main()
     
 
    
 if __name__ == "__main__":
-    PlotGTKWindow = PlotGTKWindow()
-    #editor.load_file('/home/fernando/pDynamoWorkSpace/glucose_Dec_13_2014/2_step_GeometryOptmization/2_step_GeometryOptmization.log')
+    parameters = ParseOutputLogFile ('/home/labio/Dropbox/mastersGUI/1_MonteCarlo.log')
+    PlotGTKWindow = PlotGTKWindow(parameters)
     
