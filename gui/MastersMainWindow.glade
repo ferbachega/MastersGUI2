@@ -215,7 +215,7 @@
               <object class="GtkToolButton" id="toolbutton_NewProject">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Botao</property>
+                <property name="label" translatable="yes">New</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image2</property>
                 <signal name="clicked" handler="on_toolbutton_NewProject_clicked" swapped="no"/>
@@ -229,7 +229,7 @@
               <object class="GtkToolButton" id="toolbutton_LoadProjectChooserDialog">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">toolbutton2</property>
+                <property name="label" translatable="yes">Open</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image3</property>
                 <signal name="clicked" handler="on_toolbutton_LoadProjectChooserDialog_clicked" swapped="no"/>
@@ -243,7 +243,7 @@
               <object class="GtkToolButton" id="button_DeleteCurrentProject">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">toolbutton6</property>
+                <property name="label" translatable="yes">Delete Project</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image4</property>
                 <signal name="clicked" handler="on_button_DeleteCurrentProject_clicked" swapped="no"/>
@@ -257,7 +257,7 @@
               <object class="GtkToolButton" id="toolbutton_DeleteSelectedJob">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">toolbutton2</property>
+                <property name="label" translatable="yes">Delete Job</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image8</property>
                 <signal name="clicked" handler="on_toolbutton_DeleteSelectedJob_clicked" swapped="no"/>
@@ -304,7 +304,7 @@
               <object class="GtkToolButton" id="toolbutton_MonteCarlo">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">toolbutton9</property>
+                <property name="label" translatable="yes">Monte Carlo</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image1</property>
                 <signal name="clicked" handler="on_toolbutton_MonteCarlo_clicked" swapped="no"/>
@@ -328,7 +328,7 @@
               <object class="GtkToolButton" id="toolbutton1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">toolbutton1</property>
+                <property name="label" translatable="yes">Help</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image6</property>
                 <signal name="clicked" handler="testGTKMatplotLib" swapped="no"/>
