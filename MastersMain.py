@@ -41,12 +41,20 @@ from  pprint import pprint
 import pango
 
 #------------------------GUI------------------------#
-from gui.FileChooserWindow    import FileChooserWindow 
-from gui.NewProjectDialog     import NewProjectDialog
-from gui.WorkspaceDialog      import WorkspaceDialog
-from gui.ProjectChooserDialog import ProjectChooserDialog
-from gui.MonteCarloDialog     import MonteCarloDialog
-from modules.MatplotGTK       import PlotGTKWindow, ParseOutputLogFile
+from gui.FileChooserWindow       import FileChooserWindow 
+from gui.NewProjectDialog        import NewProjectDialog
+from gui.WorkspaceDialog         import WorkspaceDialog
+from gui.ProjectChooserDialog    import ProjectChooserDialog
+from gui.MonteCarloDialog        import MonteCarloDialog
+from modules.MatplotGTK          import PlotGTKWindow, ParseOutputLogFile
+from subprocess                  import Popen
+from MASTERSviewer.MASTERSviewer import MASTERSviewerWindow
+# Roda o gateway
+p = Popen(['sh', '/home/labio/Documents/NetlogoMasters/MASTERS/run_masters_gateway.sh'])
+
+# faz tudo que precisa (todo o resto)
+
+
 #from WindowControl          import WindowControl
 #from MCwindow               import MonteCarloSimulationWindow
 #from MastersWorkSpaceDialog import WorkSpaceDialog
@@ -335,122 +343,12 @@ class MastersMain():
         self.MonteCarloDialog.ImportCellValorsFromProject()
         self.MonteCarloDialog.dialog.run()
         self.MonteCarloDialog.dialog.hide()
-
-
-    def testGTKMatplotLib(self, button):
-        """ Function doc """
-        from matplotlib.figure import Figure
-        from numpy import arange, sin, pi
-
-        # uncomment to select /GTK/GTKAgg/GTKCairo
-        #from matplotlib.backends.backend_gtk import FigureCanvasGTK as FigureCanvas
-        from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanvas
-        from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
-
-
-        box = self.builder.get_object('vbox4')
-        self.graph = box
-
-        f = Figure(figsize=(5, 4), dpi=100)
-        a = f.add_subplot(111)
-        #t = arange(0.0,3.0,0.01)
-        #s = sin(2*pi*t)
-        t = range(0, 10)
-        s = range(0, 10)
-
-        t = [0,
-             5,
-             10,
-             15,
-             20,
-             25,
-             30,
-             35,
-             40,
-             45,
-             50,
-             55,
-             60,
-             65,
-             70,
-             75,
-             80,
-             85,
-             90,
-             95,
-             100,
-             105,
-             110,
-             115,
-             120,
-             125,
-             130,
-             135,
-             140,
-             145,
-             150,
-             155,
-             160,
-             165,
-             170,
-             175,
-             180,
-             185,
-             190,
-             195,
-             200]
-
-        s = [-913.53086808,
-             -1978.05074306,
-             -2218.21815405,
-             -2333.01919415,
-             -2391.82858579,
-             -2435.17776079,
-             -2486.44564867,
-             -2543.07423428,
-             -2571.71716511,
-             -2598.62940311,
-             -2616.98004127,
-             -2631.60794731,
-             -2648.00535887,
-             -2661.72725012,
-             -2675.65233140,
-             -2686.34375946,
-             -2696.94907090,
-             -2708.65130605,
-             -2718.73853503,
-             -2726.36193409,
-             -2732.59504750,
-             -2737.83623730,
-             -2742.33435229,
-             -2745.28712806,
-             -2748.82036113,
-             -2752.12502818,
-             -2754.57566090,
-             -2756.97531091,
-             -2758.83136980,
-             -2760.53521449,
-             -2762.79017667,
-             -2764.47319544,
-             -2765.99011566,
-             -2767.77186148,
-             -2770.20329165,
-             -2772.66204338,
-             -2775.05818125,
-             -2776.97966619,
-             -2779.02106271,
-             -2781.43441141,
-             -2783.70324049]
-
-        a.plot(t, s, 'ko', t, s, 'k')
-        #a.plot(x, y, 'ko',x, y,'k')
-        canvas = FigureCanvas(f)  # a gtk.DrawingArea
-        self.graph.pack_start(canvas)
-        toolbar = NavigationToolbar(canvas, self.graph)
-        self.graph.pack_end(toolbar, False, False)
-        self.graph.show_all()
-        # gtk.main()
     
+    def on_toolbutton_loadMASTERSViewer_clicked (self, button):
+        """ Function doc """
+        
+        
+        
     #------------------------------------------------#
     #               TREEVIEW  METHODS                #
     #------------------------------------------------#         
@@ -512,6 +410,8 @@ class MastersMain():
 def main():
     masters = MastersMain()
     masters.run()
+    #fecha o gateway quando for sair do programa
+    p.terminate()
     return 0
 
 if __name__ == '__main__':
