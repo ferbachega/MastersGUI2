@@ -48,7 +48,7 @@ from gui.ProjectChooserDialog    import ProjectChooserDialog
 from gui.MonteCarloDialog        import MonteCarloDialog
 from modules.MatplotGTK          import PlotGTKWindow, ParseOutputLogFile
 from subprocess                  import Popen
-from MASTERSviewer.MASTERSviewer import MASTERSviewerWindow
+from MASTERSviewer.MASTERSviewer import MASTERS_main
 # Roda o gateway
 p = Popen(['sh', '/home/labio/Documents/NetlogoMasters/MASTERS/run_masters_gateway.sh'])
 
@@ -90,9 +90,7 @@ class MastersMain():
         self.projects = {}
         self.selectedID  = None
         #self.selectedObj = None    
-        
-
-        
+    
         #---------------------------------------------------------#
         #                PROJECT HISTORY DATA                     #
         #---------------------------------------------------------#      
@@ -346,7 +344,7 @@ class MastersMain():
     
     def on_toolbutton_loadMASTERSViewer_clicked (self, button):
         """ Function doc """
-        
+        MASTERS_main()
         
         
     #------------------------------------------------#

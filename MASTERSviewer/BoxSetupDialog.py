@@ -29,7 +29,7 @@ import gtk.gtkgl
 import gobject
 import pymol2
 from pymol import cmd
-from WindowControl import *
+#from WindowControl import *
 
 # Imports
 from OpenGL.GL import *
@@ -41,6 +41,9 @@ from FileChooserWindow           import *
 from pymol import cmd
 from pymol.cgo import *
 from pymol_connector import PymolWindow
+
+from FileChooserWindow import *
+
 
 '''
 if not sys.platform.startswith('win'):
@@ -203,14 +206,45 @@ class BoxSetupDialog:
         """ Function doc """
         print 'on_window1_destroy_event'
         
-
+    def LoadFileInMASTERSViewer (self, filein = None):
+        """ Function doc """
+        print filein
+        cmd.load(filein)
+        cmd.show("spheres")                                    
+        cmd.hide('lines')
+        cmd.show('ribbon')                                     
+        cmd.color('blue')
+        
+        cmd.do('select resn leu')
+        cmd.do('color red, sele')
+        cmd.do('select resn ala')
+        cmd.do('color red, sele')
+        cmd.do('select resn ile')
+        cmd.do('color red, sele')
+        cmd.do('select resn pro')
+        cmd.do('color red, sele')
+        cmd.do('select resn val')
+        cmd.do('color red, sele')
+        cmd.do('select resn met')
+        cmd.do('color red, sele')
+        cmd.do('select resn gly')
+        cmd.do('color red, sele')
+        cmd.do('select resn cys')
+        cmd.do('color red, sele')      
+ 
     
-    def __init__(self, project=None, window_control=None, main_builder=None, filein = None):
+    def  on_button_OpenFile_clicked(self, button):
+        """ Function doc """
+        print 'aqui' 
+        builder = self.builder
+        filein = self.FileChooserWindow.GetFileName(builder)
+        self.LoadFileInMASTERSViewer(filein)
+        
+    
+    def __init__(self, Session = None, filein = None):
         """ Class initialiser """
  
         self.pymol_window = PymolWindow()
-        self.project = project
-        self.window_control = window_control
         #self.builder = gtk.Builder()
         #self.main_builder = main_builder
 
@@ -238,28 +272,28 @@ class BoxSetupDialog:
 		'''
         
         
-        if project == None:
-            project= {'Cell' : {'minX' : -10.0,
-                                'minY' : -10.0,
-                                'minZ' : -10.0,
-                                'maxX' :  10.0,
-                                'maxY' :  10.0,
-                                'maxZ' :  10.0}
-                                }
-        
-        self.minX = project['Cell']['minX']
-        self.minY = project['Cell']['minY']
-        self.minZ = project['Cell']['minZ']
-        self.maxX = project['Cell']['maxX']
-        self.maxY = project['Cell']['maxY']
-        self.maxZ = project['Cell']['maxZ']
-        
-        print self.minX
-        print self.minY
-        print self.minZ
-        print self.maxX
-        print self.maxY
-        print self.maxZ
+        #if project == None:
+        #    project= {'Cell' : {'minX' : -10.0,
+        #                        'minY' : -10.0,
+        #                        'minZ' : -10.0,
+        #                        'maxX' :  10.0,
+        #                        'maxY' :  10.0,
+        #                        'maxZ' :  10.0}
+        #                        }
+        #
+        #self.minX = project['Cell']['minX']
+        #self.minY = project['Cell']['minY']
+        #self.minZ = project['Cell']['minZ']
+        #self.maxX = project['Cell']['maxX']
+        #self.maxY = project['Cell']['maxY']
+        #self.maxZ = project['Cell']['maxZ']
+        #
+        #print self.minX
+        #print self.minY
+        #print self.minZ
+        #print self.maxX
+        #print self.maxY
+        #print self.maxZ
         
 
 
@@ -304,7 +338,7 @@ class BoxSetupDialog:
         #self.DrawCell()
         
         if filein == None:
-            cmd.load('/home/labio/InhA_1p44_C_NAH_noH.pdb')
+            cmd.load('/home/fernando/programs/MastersGUI2/MASTERSviewer/my_system_full.pdb')
         else:
             cmd.load(filein)                            #
         
@@ -330,42 +364,45 @@ class BoxSetupDialog:
         cmd.do('select resn cys')
         cmd.do('color red, sele') 
         
-        #adjustment1 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
-        #self.spinbutton_minX  = self.builder.get_object("spinbutton_minX")
-        #self.spinbutton_minX.set_adjustment(adjustment1)
-        #self.spinbutton_minX.update()
+        self.FileChooserWindow = FileChooserWindow()
+        
+        
+        adjustment1 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
+        self.spinbutton_minX  = self.builder.get_object("spinbutton_minX")
+        self.spinbutton_minX.set_adjustment(adjustment1)
+        self.spinbutton_minX.update()
         #self.spinbutton_minX.set_value(int(project['Cell']['minX']))
-        #
-        #adjustment2 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
-        #self.spinbutton_minY  = self.builder.get_object("spinbutton_minY")
-        #self.spinbutton_minY.set_adjustment(adjustment2)
-        #self.spinbutton_minY.update()
+
+        adjustment2 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
+        self.spinbutton_minY  = self.builder.get_object("spinbutton_minY")
+        self.spinbutton_minY.set_adjustment(adjustment2)
+        self.spinbutton_minY.update()
         #self.spinbutton_minY.set_value(int(project['Cell']['minY']))
-        #
-        #adjustment3 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
-        #self.spinbutton_minZ  = self.builder.get_object("spinbutton_minZ")
-        #self.spinbutton_minZ.set_adjustment(adjustment3)
-        #self.spinbutton_minZ.update()
+
+        adjustment3 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
+        self.spinbutton_minZ  = self.builder.get_object("spinbutton_minZ")
+        self.spinbutton_minZ.set_adjustment(adjustment3)
+        self.spinbutton_minZ.update()
         #self.spinbutton_minZ.set_value(int(project['Cell']['minZ']))
-        #
-        #adjustment4 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
-        #self.spinbutton_maxX  = self.builder.get_object("spinbutton_maxX")
-        #self.spinbutton_maxX.set_adjustment(adjustment4)
-        #self.spinbutton_maxX.update()
+        
+        adjustment4 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
+        self.spinbutton_maxX  = self.builder.get_object("spinbutton_maxX")
+        self.spinbutton_maxX.set_adjustment(adjustment4)
+        self.spinbutton_maxX.update()
         #self.spinbutton_maxX.set_value(int(project['Cell']['maxX']))
-        #
-        #adjustment5 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
-        #self.spinbutton_maxY  = self.builder.get_object("spinbutton_maxY")
-        #self.spinbutton_maxY.set_adjustment(adjustment5)
-        #self.spinbutton_maxY.update()
+
+        adjustment5 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
+        self.spinbutton_maxY  = self.builder.get_object("spinbutton_maxY")
+        self.spinbutton_maxY.set_adjustment(adjustment5)
+        self.spinbutton_maxY.update()
         #self.spinbutton_maxY.set_value(int(project['Cell']['maxY']))
-        #
-        #adjustment6 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
-        #self.spinbutton_maxZ  = self.builder.get_object("spinbutton_maxZ")
-        #self.spinbutton_maxZ.set_adjustment(adjustment6)
-        #self.spinbutton_maxZ.update()
+
+        adjustment6 = gtk.Adjustment(0.0, -1000.0, 1000.0, 1.0, 0.0, 0.0)
+        self.spinbutton_maxZ  = self.builder.get_object("spinbutton_maxZ")
+        self.spinbutton_maxZ.set_adjustment(adjustment6)
+        self.spinbutton_maxZ.update()
         #self.spinbutton_maxZ.set_value(int(project['Cell']['maxZ'])) 
-        #
+        
         #self.DrawCell()
         
     def run(self):
